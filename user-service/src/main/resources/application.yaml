@@ -23,7 +23,7 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret:
+  secret: "QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo"
   expiration: 86400000
 
 eureka:

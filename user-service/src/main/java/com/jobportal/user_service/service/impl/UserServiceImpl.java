@@ -51,12 +51,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        log.info("Login attempt for : {]", request.getEmail());
+        log.info("Login attempt for : {}", request.getEmail());
 
         UserEntity user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("No account found with : " + request.getEmail()));
 
-        if(passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Incorrect Password");
         }
 
