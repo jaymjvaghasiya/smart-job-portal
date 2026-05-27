@@ -5,7 +5,11 @@ import com.jobportal.job_service.dto.response.JobResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface JobService {
     JobResponse createJob(@Valid CreateJobRequest request);
+
+    List<JobResponse> getAllJobs();
 }

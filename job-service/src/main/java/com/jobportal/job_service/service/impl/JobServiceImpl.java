@@ -7,7 +7,11 @@ import com.jobportal.job_service.repository.JobRepository;
 import com.jobportal.job_service.service.JobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,6 +40,16 @@ public class JobServiceImpl implements JobService {
         log.info("Job created with Id: {}", saved.getId());
 
         return mapToResponse(saved);
+    }
+
+    @Override
+    @Cacheable(value = "allJobs")
+    public List<JobResponse> getAllJobs() {
+        log.info("Fetching all active jobs.");
+        return jobRepository.findByStatus(JobEntity.JobStatus.ACTIVE)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public JobResponse mapToResponse(JobEntity job) {
