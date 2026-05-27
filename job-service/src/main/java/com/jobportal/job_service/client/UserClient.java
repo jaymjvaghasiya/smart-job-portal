@@ -1,0 +1,16 @@
+package com.jobportal.job_service.client;
+
+import com.jobportal.job_service.dto.response.UserResponse;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(
+        name = "user-service",
+        fallback = UserClientFallBack.class
+)
+public interface UserClient {
+
+    @GetMapping("/api/user/{id}")
+    UserResponse getUserById(@PathVariable Long id);
+}
