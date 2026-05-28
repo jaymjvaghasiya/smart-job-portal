@@ -27,4 +27,24 @@ public class JobController {
     public ResponseEntity<List<JobResponse>> getAllJobs() {
         return ResponseEntity.ok().body(jobService.getAllJobs());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<JobResponse> getJobById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(jobService.getJobById(id));
+    }
+
+    @GetMapping("/{search}")
+    public ResponseEntity<List<JobResponse>> searchJobs(@RequestParam String keyword) {
+        return ResponseEntity.ok().body(jobService.searchJobs(keyword));
+    }
+
+    @GetMapping("/recruiter/{recruiterId}")
+    public ResponseEntity<List<JobResponse>> getJobsByRecruiter(@PathVariable Long recruiterId) {
+        return ResponseEntity.ok().body(jobService.getJobsByRecruiterId(recruiterId));
+    }
+
+    @PatchMapping("/{id}/close")
+    public ResponseEntity<JobResponse> closeJob(@PathVariable Long id) {
+        return ResponseEntity.ok().body(jobService.closeJob(id));
+    }
 }

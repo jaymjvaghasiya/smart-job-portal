@@ -22,7 +22,7 @@ public class CreateJobRequest {
     @NotBlank(message = "Location is required.")
     private String location;
 
-    private List<String> skill;
+    private String skills;
 
     private Double salaryMin;
 

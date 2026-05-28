@@ -36,7 +36,7 @@ public class JobEntity {
     @Column(nullable = false)
     private String location;
 
-    private List<String> skill;
+    private String skills;
 
     private Double salaryMin;
 

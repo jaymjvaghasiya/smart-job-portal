@@ -12,4 +12,12 @@ public interface JobService {
     JobResponse createJob(@Valid CreateJobRequest request);
 
     List<JobResponse> getAllJobs();
+
+    JobResponse getJobById(Long id);
+
+    List<JobResponse> searchJobs(String keyword);
+
+    List<JobResponse> getJobsByRecruiterId(Long recruiterId);
+
+    JobResponse closeJob(Long id);
 }

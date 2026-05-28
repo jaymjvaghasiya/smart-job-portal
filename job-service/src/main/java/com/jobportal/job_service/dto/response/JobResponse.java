@@ -25,7 +25,7 @@ public class JobResponse {
 
     private String location;
 
-    private List<String> skill;
+    private String skills;
 
     private Double salaryMin;
 
