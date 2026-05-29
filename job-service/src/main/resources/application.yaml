@@ -38,7 +38,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-jwe:
+jwt:
   secret: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
   expiration: 86400000
 
