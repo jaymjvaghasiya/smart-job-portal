@@ -31,3 +31,35 @@ spring:
     type: redis
     redis:
       time-to-live: 600000
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producers:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+jwe:
+  secret: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+  expiration: 86400000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+feign:
+  circuitbreaker:
+    enabled: true
+  client:
+    config:
+      default:
+        connection-timeout: 5000
+        read-timeout: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
