@@ -34,7 +34,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApplicationResponse applyForJob(Long jobId, ApplyJobRequest request) {
 
-        log.info("User {} applying for job {}", request.getApplicationId(), jobId);
+        log.info("User {} applying for job {}", request.getApplicantId(), jobId);
 
         JobEntity job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new JobNotFoundException("Job not found with id: " + jobId));
@@ -43,15 +43,15 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new JobNotFoundException("Job is no longer accepting applications");
         }
 
-        if(applicationRepository.existsByApplicantIdAndJobId(request.getApplicationId(), jobId)) {
+        if(applicationRepository.existsByApplicantIdAndJobId(request.getApplicantId(), jobId)) {
             throw new AlreadyAppliedException("You have already applied for this job");
         }
 
-        UserResponse user = userClient.getUserById(request.getApplicationId());
+        UserResponse user = userClient.getUserById(request.getApplicantId());
 
         JobApplication application = new JobApplication();
         application.setJobId(jobId);
-        application.setApplicantId(request.getApplicationId());
+        application.setApplicantId(request.getApplicantId());
         application.setApplicantName(user.getFirstname() + " " + user.getLastname());
         application.setApplicantEmail(user.getEmail());
         application.setStatus(JobApplication.ApplicationStatus.APPLIED);
@@ -61,7 +61,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         jobEventProducer.publishJobApplied(new JobAppliedEvent(
                 jobId,
                 job.getTitle(),
-                request.getApplicationId(),
+                request.getApplicantId(),
                 user.getFirstname() + " " + user.getLastname(),
                 user.getEmail(),
                 job.getRecruiterEmail(),

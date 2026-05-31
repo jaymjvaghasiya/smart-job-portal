@@ -38,6 +38,7 @@ public class JobApplication {
     private String applicantEmail;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(20)")
     private ApplicationStatus status;
 
     @CreationTimestamp

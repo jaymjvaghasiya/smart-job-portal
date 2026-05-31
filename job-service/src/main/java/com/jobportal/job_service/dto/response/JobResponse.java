@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobResponse {
+public class JobResponse implements Serializable {
 
     private Long id;
 
@@ -27,9 +29,9 @@ public class JobResponse {
 
     private String skills;
 
-    private Double salaryMin;
+    private BigDecimal salaryMin;
 
-    private Double salaryMax;
+    private BigDecimal salaryMax;
 
     private Long recruiterId;
 

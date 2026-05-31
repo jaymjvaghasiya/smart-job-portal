@@ -48,7 +48,7 @@ public class JobServiceImpl implements JobService {
     @Cacheable(value = "allJobs")
     public List<JobResponse> getAllJobs() {
         log.info("Fetching all active jobs.");
-        return jobRepository.findByStatus(JobEntity.JobStatus.ACTIVE)
+        return jobRepository.findByJobStatus(JobEntity.JobStatus.ACTIVE)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

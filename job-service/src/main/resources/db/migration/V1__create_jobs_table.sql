@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     salary_max DECIMAL(10, 2),
     recruiter_id BIGINT NOT NULL,
     recruiter_email VARCHAR(150) NOT NULL,
-    job_status VARCHAR(20) DEFAULT NOT NULL 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    job_status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
