@@ -1,4 +1,4 @@
-CREATE TABLE IS NOT EXISTS job_applications (
+CREATE TABLE IF NOT EXISTS job_applications (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     job_id BIGINT NOT NULL,
     applicant_id BIGINT NOT NULL,

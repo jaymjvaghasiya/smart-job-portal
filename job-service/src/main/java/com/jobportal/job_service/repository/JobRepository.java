@@ -10,10 +10,10 @@ import java.util.List;
 
 @Repository
 public interface JobRepository extends JpaRepository<JobEntity, Long> {
-    List<JobEntity> findByStatus(JobEntity.JobStatus jobStatus);
+    List<JobEntity> findByJobStatus(JobEntity.JobStatus jobStatus);
 
     @Query("""
-            SELECT j FROM JobEntity j WHERE J.jobStatus = 'ACTIVE' AND 
+            SELECT j FROM JobEntity j WHERE j.jobStatus = 'ACTIVE' AND 
             (LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
             LOWER(j.company) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
             LOWER(j.location) LIKE LOWER(CONCAT('%', :keyword, '%')))

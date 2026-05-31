@@ -9,11 +9,12 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Jobs")
+@Table(name = "jobs")
 @Setter
 @Getter
 @AllArgsConstructor
@@ -38,9 +39,9 @@ public class JobEntity {
 
     private String skills;
 
-    private Double salaryMin;
+    private BigDecimal salaryMin;
 
-    private Double salaryMax;
+    private BigDecimal salaryMax;
 
     @Column(nullable = false)
     private Long recruiterId;
@@ -49,7 +50,7 @@ public class JobEntity {
     private String recruiterEmail;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private JobStatus jobStatus;
 
     @CreationTimestamp

@@ -33,7 +33,7 @@ public class JobController {
         return ResponseEntity.ok().body(jobService.getJobById(id));
     }
 
-    @GetMapping("/{search}")
+    @GetMapping("/search")
     public ResponseEntity<List<JobResponse>> searchJobs(@RequestParam String keyword) {
         return ResponseEntity.ok().body(jobService.searchJobs(keyword));
     }

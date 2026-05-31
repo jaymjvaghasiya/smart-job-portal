@@ -1,9 +1,11 @@
 package com.jobportal.job_service.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Setter
@@ -24,11 +26,11 @@ public class CreateJobRequest {
 
     private String skills;
 
-    private Double salaryMin;
+    private BigDecimal salaryMin;
 
-    private Double salaryMax;
+    private BigDecimal salaryMax;
 
-    @NotBlank(message = "Recruiter ID is required")
+    @NotNull(message = "Recruiter ID is required")
     private Long recruiterId;
 
     @NotBlank(message = "Recruiter email is required")
