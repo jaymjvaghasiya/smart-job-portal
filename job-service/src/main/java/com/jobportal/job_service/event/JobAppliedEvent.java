@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class JobAppliedEvent {
     private Long jobId;
     private String jobTitle;
-    private Long applicationId;
+    private Long applicantId;
     private String applicantName;
     private String applicantEmail;
     private String recruiterEmail;
