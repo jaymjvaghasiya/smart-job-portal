@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
                             event.getJobTitle(),
                             event.getApplicantName(),
                             event.getApplicantEmail(),
-                            event.getAppliesAt()
+                            event.getAppliedAt()
                     )
             );
 
@@ -73,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
                     """.formatted(
                             event.getApplicantName(),
                             event.getJobTitle(),
-                            event.getAppliesAt()
+                            event.getAppliedAt()
                     )
             );
 
