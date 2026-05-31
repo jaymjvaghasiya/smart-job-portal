@@ -16,10 +16,10 @@
     <!-- All child modules listed here -->
     <modules>
         <module>eureka-server</module>
-        <!--        <module>api-gateway</module>-->
+        <module>api-gateway</module>
         <module>user-service</module>
         <module>job-service</module>
-        <!--        <module>notification-service</module>-->
+        <module>notification-service</module>
     </modules>
 
     <!-- Inherit Spring Boot defaults -->
