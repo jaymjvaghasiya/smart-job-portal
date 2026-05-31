@@ -1,0 +1,56 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service-register
+          uri: lb://user-service
+          predicates:
+           - Path=/api/users/register, /api/users/login
+
+        - id: user-service-protected
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - name: JwtAuthFilter
+
+        - id: job-service-public
+          uri: lb://job-service
+          predicates:
+            - Path=/api/jobs, /api/jobs/{id}, /api/jobs/search
+
+        - id: job-service-protected
+          uri: lb://job-service
+          predicates:
+            - Path=/api/jobs/**
+          filters:
+            - name: JwtAuthFilter
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+
+jwt:
+  secret: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
