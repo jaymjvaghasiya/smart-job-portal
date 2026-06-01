@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+
+  mysql-users:
+    image: mysql:8.0
+    container_name: mysql-users
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_BD: smart_job_portal_user_service
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - mysql_users_data:/var/lib/mysql/data
+    networks:
+      - job-portal-network
+
+  mysql-jobs:
+    image: mysql:8.0
+    container_name: mysql-jobs
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DB: smart_job_portal_job_service
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "5433:5432"
+    volumes:
+      - mysql_jobs_data:/var/lib/mysql/data
+    networks:
+      - job-portal-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - job-portal-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - job-portal-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENER: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INNER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - job-portal-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - job-portal-network
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql-users
+      - eureka-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-users:5432/smart_job_portal_user_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+      JWT_EXPIRATION: 86400000
+    networks:
+      - job-portal-network
+
+  job-service:
+    build:
+      context: ./job-service
+      dockerfile: Dockerfile
+    container_name: job-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql-jobs
+      - redis
+      - kafka
+      - eureka-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-jobs:5432/smart_job_portal_job_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+      JWT_EXPIRATION: 86400000
+    networks:
+      - job-portal-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - eureka-server
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: vaghasiyajaykumar251@gmail.com
+      SPRING_MAIL_PASSWORD: gqoszdnlqcybltwj
+    networks:
+      - job-portal-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - user-service
+      - job-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761:eureka/
+      JWT_SECRET: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+    networks:
+      - job-portal-network
+
+volumes:
+  mysql_users_data:
+  mysql_jobs_data:
+
+networks:
+  job-portal-network:
+    driver: bridge
