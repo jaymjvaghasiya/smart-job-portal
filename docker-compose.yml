@@ -5,30 +5,46 @@ services:
   mysql-users:
     image: mysql:8.0
     container_name: mysql-users
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_BD: smart_job_portal_user_service
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: smart_job_portal_user_service
+      MYSQL_USER: jobportal
+      MYSQL_PASSWORD: jobportal123
+      MYSQL_ROOT_HOST: "%"
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     volumes:
-      - mysql_users_data:/var/lib/mysql/data
+      - mysql_users_data:/var/lib/mysql
     networks:
       - job-portal-network
 
   mysql-jobs:
     image: mysql:8.0
     container_name: mysql-jobs
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DB: smart_job_portal_job_service
-      MYSQL_USERNAME: root
-      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: smart_job_portal_job_service
+      MYSQL_USER: jobportal
+      MYSQL_PASSWORD: jobportal123
+      MYSQL_ROOT_HOST: "%"
     ports:
-      - "5433:5432"
+      - "3308:3306"
     volumes:
-      - mysql_jobs_data:/var/lib/mysql/data
+      - mysql_jobs_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     networks:
       - job-portal-network
 
@@ -37,6 +53,8 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - job-portal-network
 
@@ -59,7 +77,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENER: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INNER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -85,12 +103,19 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mysql-users
-      - eureka-server
+      mysql-users:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-users:5432/smart_job_portal_user_service
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-users:3306/smart_job_portal_user_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: jobportal
+      SPRING_DATASOURCE_PASSWORD: jobportal123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JWT_SECRET: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
       JWT_EXPIRATION: 86400000
@@ -105,14 +130,23 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - mysql-jobs
-      - redis
-      - kafka
-      - eureka-server
+      mysql-jobs:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-jobs:5432/smart_job_portal_job_service
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-jobs:3306/smart_job_portal_job_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: jobportal
+      SPRING_DATASOURCE_PASSWORD: jobportal123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
@@ -154,7 +188,7 @@ services:
       - user-service
       - job-service
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761:eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       JWT_SECRET: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
     networks:
       - job-portal-network
@@ -162,6 +196,7 @@ services:
 volumes:
   mysql_users_data:
   mysql_jobs_data:
+  redis_data:
 
 networks:
   job-portal-network:
