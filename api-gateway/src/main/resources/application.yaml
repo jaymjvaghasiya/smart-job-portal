@@ -40,7 +40,7 @@ spring:
             allowed-headers: "*"
 
 jwt:
-  secret: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
+  secret: ${JWT_SECRET}
 
 eureka:
   client:

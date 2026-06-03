@@ -5,9 +5,9 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:mysql://localhost:3307/smart_job_portal_user_service
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3307/${MYSQL_USERS_DATABASE}
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
 
   jpa:
     hibernate:
@@ -23,8 +23,8 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: QwErTyUiOpGhJfDs7458LmN5JbVg74XcDZo
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 eureka:
   client:
